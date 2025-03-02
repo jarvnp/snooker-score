@@ -6,7 +6,7 @@
     <title>Snooker Scoreboard</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        .scoreboard { display: flex; justify-content: center; gap: 50px; margin-top: 20px; }
+        .scoreboard { display: flex; justify-content: center; gap: 50px; margin-top: 20px; flex-wrap: wrap;}
         .player { border: 2px solid black; padding: 20px; width: 200px; }
         .active { background-color: lightgreen; }
         .controls { margin-top: 20px; }
@@ -253,7 +253,7 @@
             turn = getTurn()
             let redsLost = 0;
             if(redsRemaining() > 0){
-                redsLost = prompt("Enter the number of reds lost:", "0");
+                redsLost = prompt("Virheen yhteydessä pussiin menneet punaiset:", "0");
             }
             redsLost = parseInt(redsLost) || 0;
             redsLost = Math.min(redsLost,redsRemaining())
