@@ -187,7 +187,8 @@
         function nextPossiblePots(){
             let nextColor = getNextColor()
             if(history.length == 0){
-                return new Set([1]);
+                if(redsRemaining() > 0)return new Set([1]);
+                return new Set([2])
             }
             lastAction = history[history.length-1];
             if(lastAction.type == 'foul'){
