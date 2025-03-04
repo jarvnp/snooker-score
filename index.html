@@ -296,6 +296,9 @@
         }
 
         updateUI();
+        window.onbeforeunload = function (){
+            return "";
+        };
     </script>
 </body>
 </html>
