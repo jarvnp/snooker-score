@@ -47,6 +47,8 @@
         </div>
     </div>
 
+    <h2><span id="frameScore">0 - 0</span></h2>
+
     <h3>Nykyinen breikki: <span id="currentBreak">0</span></h3>
     <div class="break-display" id="breakBalls"></div>
 
@@ -72,20 +74,27 @@
     </div>
 
     <button class="undo-btn" onclick="undo()">Kumoa</button>
+    <div class="controls">
+        <h3>Valitse framen voittaja</h3>
+        <button class="foul-btn" id="win1" onclick="endFrame(1)">...</button>
+        <button class="foul-btn" id="tie" onclick="endFrame(0)">Uusi frame/rerack</button>
+        <button class="foul-btn" id="win2" onclick="endFrame(2)">...</button>
+    </div>
     <br><br>
-    <form onsubmit="event.preventDefault(); init();">
-        <button type="submit">Aloita uusi frame</button>
-        <label for="gameValue">Punaisten määrä alussa:</label>
+    <form onsubmit="event.preventDefault(); initFrame();">
+        <label for="gameValue">Punaisten määrä alussa (vaikuttaa seuraavaan aloitettuun frameen):</label>
         <input type="number" id="nReds" name="gameValue" value="15" required>
     </form>
 
+    <button onclick="if(confirm('Oletko varma?')) initMatch();">Aloita uusi ottelu</button>
+
     <div class="scoreboard">
         <div class="player">
-            <h3>Top 5 breikit:</h3>
+            <h3>Top 10 lyöntisarjat:</h3>
             <ul id="breaks1"></ul>
         </div>
         <div class="player">
-            <h3>Top 5 breikit:</h3>
+            <h3>Top 10 lyöntisarjat:</h3>
             <ul id="breaks2"></ul>
         </div>
     </div>
@@ -93,6 +102,8 @@
     <script>
         let history = [];
         let redsStart = 15;
+        let matchBreaks = [[],[]];
+        let frameScore = [0, 0]; // Track frames won (Player 1 - Player 2)
 
         function redsRemaining(){
             redsPotted = history.filter(action => action.type === 'pot' && action.points === 1 && action.isFreeBall === false).length
@@ -165,17 +176,29 @@
                 breaks[currentPlayer].push(currentBreak)
             }
 
-            const SHOW_BREAKS = 5;
+            const SHOW_BREAKS = 10;
+            breaks[0].push(...matchBreaks[0])
+            breaks[1].push(...matchBreaks[1])
             breaks[0] = breaks[0].sort((a,b)=>b-a).slice(0,SHOW_BREAKS);
             breaks[1] = breaks[1].sort((a,b)=>b-a).slice(0,SHOW_BREAKS);
             return breaks
         }
 
-        function init() {
+        function initFrame() {
+            matchBreaks = getBreaks().slice()
             let nReds = document.getElementById("nReds").value;
             history = [];
             redsStart = nReds;
             updateUI();
+        }
+
+        function initMatch(){
+            history = [];
+            matchBreaks = [[],[]];
+            frameScore = [0, 0];
+            document.getElementById('name1').value = "Player 1"
+            document.getElementById('name2').value = "Player 2"
+            initFrame()
         }
 
         // Used after all reds are potted
@@ -236,6 +259,7 @@
             document.getElementById('currentBreak').innerText = getCurrentBreak();
             document.getElementById('breakBalls').innerHTML = getBreakBalls().join('');
             updateBreakList();
+            updateFrameScore();
         }
 
         function potBall(ballValue, color) {
@@ -297,6 +321,30 @@
             document.getElementById('breaks1').innerHTML = breaks[0].map(b => `<li>${b}</li>`).join('');
             document.getElementById('breaks2').innerHTML = breaks[1].map(b => `<li>${b}</li>`).join('');
         }
+
+        function endFrame(result) {
+            if (!confirm("Oletko varma?")) return;
+
+            if (result === 1) frameScore[0]++; // Player 1 wins
+            if (result === 2) frameScore[1]++; // Player 2 wins
+
+            updateFrameScore();
+            initFrame(); // Start a new frame
+        }
+
+        function updateFrameScore() {
+            document.getElementById('frameScore').innerText = `${frameScore[0]} - ${frameScore[1]}`;
+        }
+
+        function updateButtonLabels() {
+            document.getElementById('win1').innerText = document.getElementById('name1').value + " voitti framen";
+            document.getElementById('win2').innerText = document.getElementById('name2').value + " voitti framen";
+        }
+
+        // Run the function initially and whenever names are updated
+        updateButtonLabels();
+        document.getElementById('name1').addEventListener('input', updateButtonLabels);
+        document.getElementById('name2').addEventListener('input', updateButtonLabels);
 
         updateUI();
         window.onbeforeunload = function (){
