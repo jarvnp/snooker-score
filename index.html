@@ -139,7 +139,9 @@
                 if (history[i].type === 'pot') breakBalls.push(`<span style="background-color:${history[i].color}"></span>`);
                 else break; // Stop if we hit a non-pot action
             }
-
+            if(breakBalls.length == 0){
+                breakBalls.push(`<span style=visibility=hidden></span>`) // To prevent page height change when no break
+            }
             return breakBalls.reverse(); // Reverse to maintain the order in which balls were potted
         }
 
@@ -205,7 +207,8 @@
             }
             lastPot = lastAction;
             if(lastPot.points == 1 ){
-                return new Set([1,2,3,4,5,6,7])
+                if(redsRemaining() > 0) return new Set([1,2,3,4,5,6,7])
+                return new Set([2,3,4,5,6,7])
             }
             // Color potted:
             if(redsRemaining() > 0) return new Set([1])
