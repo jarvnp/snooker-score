@@ -62,18 +62,18 @@
         <button class="ball-btn blue" onclick="potBall(5, 'blue')">Blue (5)</button>
         <button class="ball-btn pink" onclick="potBall(6, 'pink')">Pink (6)</button>
         <button class="ball-btn black" onclick="potBall(7, 'black')">Black (7)</button>
-        <button class="foul-btn" onclick="endBreak()">Lopeta breikki</button>
+        <button class="foul-btn" onclick="endBreak()">Lopeta breikki (Enter)</button>
     </div>
 
     <div class="controls">
         <h3>Virhe</h3>
-        <button class="foul-btn" onclick="commitFoul(4)">4 pistettä</button>
-        <button class="foul-btn" onclick="commitFoul(5)">5 pistettä</button>
-        <button class="foul-btn" onclick="commitFoul(6)">6 pistettä</button>
-        <button class="foul-btn" onclick="commitFoul(7)">7 pistettä</button>
+        <button class="foul-btn" onclick="commitFoul(4)">4 pistettä (F4)</button>
+        <button class="foul-btn" onclick="commitFoul(5)">5 pistettä (F5)</button>
+        <button class="foul-btn" onclick="commitFoul(6)">6 pistettä (F6)</button>
+        <button class="foul-btn" onclick="commitFoul(7)">7 pistettä (F7)</button>
     </div>
 
-    <button class="undo-btn" onclick="undo()">Kumoa</button>
+    <button class="undo-btn" onclick="undo()">Kumoa (⌫)</button>
     <div class="controls">
         <h3>Valitse framen voittaja</h3>
         <button class="foul-btn" id="win1" onclick="endFrame(1)">...</button>
@@ -350,6 +350,36 @@
         window.onbeforeunload = function (){
             return "";
         };
+
+        document.addEventListener("keydown", function(event) {
+            if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+                return; // Exit the function to disable the event
+            }
+
+            const key = event.key;
+            const ballPoints = { "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7 };
+            const foulPoints = { "F4": 4, "F5": 5, "F6": 6, "F7": 7 }; // Updated key
+            const endBreakKey = "Enter";
+            const undoKey = "Backspace";
+
+            if (ballPoints[key]) {
+                potBall(ballPoints[key], getBallColor(ballPoints[key]));
+            } else if (foulPoints[key]) {
+                event.preventDefault(); // Prevent default browser behavior for function keys
+                commitFoul(foulPoints[key]);
+            } else if (key == endBreakKey){
+                event.preventDefault();
+                endBreak();
+            } else if(key == undoKey){
+                event.preventDefault();
+                undo();
+            }
+        });
+
+        function getBallColor(points) {
+            const colors = { 1: 'red', 2: 'yellow', 3: 'green', 4: 'brown', 5: 'blue', 6: 'pink', 7: 'black' };
+            return colors[points] || 'white';
+        }
     </script>
 </body>
 </html>
