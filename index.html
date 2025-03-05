@@ -290,6 +290,7 @@
             let redsLost = 0;
             if(redsRemaining() > 0){
                 redsLost = prompt("Virheen yhteydessä pussiin menneet punaiset:", "0");
+                if(redsLost == null) return
             }
             redsLost = parseInt(redsLost) || 0;
             redsLost = Math.min(redsLost,redsRemaining())
