@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snooker Scoreboard</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .scoreboard { display: flex; justify-content: center; gap: 50px; margin-top: 20px; flex-wrap: wrap;}
-        .player { border: 2px solid black; padding: 20px; width: 30%; max-width: 200px;}
+        body { font-family: Arial, sans-serif; text-align: center; overflow: hidden;}
+        .scoreboard { display: flex; justify-content: center; gap: 5%; flex-wrap: wrap; }
+        .control-boxs {display: flex; justify-content: center; gap: 5%;}
+        .player { border: 0.15vw solid black; padding: 0.5%; width: 15vw; text-align: center;}
         .active { background-color: lightgreen; }
-        .controls { margin-top: 20px; }
-        .ball-btn { padding: 10px; margin: 5px; border: none; color: white; cursor: pointer; }
-        .score {font-size: 4em;}
+        .controls {display: flex; flex-wrap: nowrap; justify-content: center; gap:1%;}
+        .btn {padding: 1%; margin-top: 3%; border: none; cursor: pointer;font-size: 0.8vw}
+        .ball-btn {color: white; }
+        .score { font-size: 7vw;}
         .red { background-color: red; }
         .yellow { background-color: yellow; color: black; }
         .green { background-color: green; }
@@ -19,17 +21,10 @@
         .blue { background-color: blue; }
         .pink { background-color: pink; color: black; }
         .black { background-color: black; }
-        .foul-btn { padding: 10px; margin: 5px; background-color: gray; color: white; border: none; cursor: pointer; }
-        .break-display span { padding: 10px; margin: 2px; display: inline-block; border-radius: 50%; }
-        .undo-btn {
-            padding: 12px 20px; /* Increases button size */
-            font-size: 16px; /* Makes text larger */
-            font-weight: bold; /* Makes text bold */
-            border: 2px solid black; /* Adds a border */
-            border-radius: 8px; /* Rounds the edges slightly */
-            background-color: #f0f0f0; /* Light gray background */
-            cursor: pointer; /* Makes it clear it's clickable */
-            transition: background-color 0.3s ease; /* Smooth hover effect */
+        .foul-btn {background-color: gray; color: white;}
+        .break-display span { padding: 0.7ch; margin: 0.1%; display: inline-block; border-radius: 50%; }
+        .undo-btn {background-color: #f0f0f0; /* Light gray background */
+            border: 0.15vw solid black; /* Adds a border */
         }
     </style>
 </head>
@@ -37,6 +32,10 @@
     <h1>Snooker Scoreboard</h1>
 
     <div class="scoreboard">
+        <div class="player">
+            <h3>Top 10 lyöntisarjat:</h3>
+            <ul id="breaks1"></ul>
+        </div>
         <div class="player" id="player1">
             <input type="text" id="name1" value="Player 1">
             <h1><span id="score1" class="score">0</span></h1>
@@ -44,6 +43,10 @@
         <div class="player" id="player2">
             <input type="text" id="name2" value="Player 2">
             <h1><span id="score2" class="score">0</span></h1>
+        </div>
+        <div class="player">
+            <h3>Top 10 lyöntisarjat:</h3>
+            <ul  id="breaks2"></ul>
         </div>
     </div>
 
@@ -54,56 +57,50 @@
 
     <h2>Mahdolliset pisteet pöydällä: <span id="remaining">147</span></h2>
 
-    <div class="controls">
-        <button class="ball-btn red" onclick="potBall(1, 'red')">Red (1)</button>
-        <button class="ball-btn yellow" onclick="potBall(2, 'yellow')">Yellow (2)</button>
-        <button class="ball-btn green" onclick="potBall(3, 'green')">Green (3)</button>
-        <button class="ball-btn brown" onclick="potBall(4, 'brown')">Brown (4)</button>
-        <button class="ball-btn blue" onclick="potBall(5, 'blue')">Blue (5)</button>
-        <button class="ball-btn pink" onclick="potBall(6, 'pink')">Pink (6)</button>
-        <button class="ball-btn black" onclick="potBall(7, 'black')">Black (7)</button>
-        <button class="foul-btn" onclick="endBreak()">Lopeta breikki (Enter)</button>
+    <div class="control-boxs">
+        <div class="controls">
+            <button class="ball-btn red btn" onclick="potBall(1, 'red')">Red (1)</button>
+            <button class="ball-btn yellow btn" onclick="potBall(2, 'yellow')">Yellow (2)</button>
+            <button class="ball-btn green btn" onclick="potBall(3, 'green')">Green (3)</button>
+            <button class="ball-btn brown btn" onclick="potBall(4, 'brown')">Brown (4)</button>
+            <button class="ball-btn blue btn" onclick="potBall(5, 'blue')">Blue (5)</button>
+            <button class="ball-btn pink btn" onclick="potBall(6, 'pink')">Pink (6)</button>
+            <button class="ball-btn black btn" onclick="potBall(7, 'black')">Black (7)</button>
+            <button class="foul-btn btn" onclick="endBreak()">Lopeta breikki (Enter)</button>
+        </div>
+        <div class="controls">
+            <h3>Virhe: </h3>
+            <button class="foul-btn btn" onclick="commitFoul(4)">4 pistettä (F4)</button>
+            <button class="foul-btn btn" onclick="commitFoul(5)">5 pistettä (F5)</button>
+            <button class="foul-btn btn" onclick="commitFoul(6)">6 pistettä (F6)</button>
+            <button class="foul-btn btn" onclick="commitFoul(7)">7 pistettä (F7)</button>
+        </div>
+    </div>
+    <div class="control-boxs">
+        <div class="controls">
+            <button class="foul-btn btn" id="win1" onclick="endFrame(1)">...</button>
+            <button class="foul-btn btn" id="tie" onclick="endFrame(0)">Uusi frame/rerack</button>
+            <button class="foul-btn btn" id="win2" onclick="endFrame(2)">...</button>
+        </div>
+    </div>
+    <div class="control-boxs">
+        <div class="controls">
+            <button class="undo-btn btn" onclick="if(confirm('Oletko varma?')) initMatch();">Aloita uusi ottelu</button>
+            <button class="undo-btn btn" onclick="undo()">Kumoa (⌫)</button>
+        </div>
     </div>
 
-    <div class="controls">
-        <h3>Virhe</h3>
-        <button class="foul-btn" onclick="commitFoul(4)">4 pistettä (F4)</button>
-        <button class="foul-btn" onclick="commitFoul(5)">5 pistettä (F5)</button>
-        <button class="foul-btn" onclick="commitFoul(6)">6 pistettä (F6)</button>
-        <button class="foul-btn" onclick="commitFoul(7)">7 pistettä (F7)</button>
-    </div>
-
-    <button class="undo-btn" onclick="undo()">Kumoa (⌫)</button>
-    <div class="controls">
-        <h3>Valitse framen voittaja</h3>
-        <button class="foul-btn" id="win1" onclick="endFrame(1)">...</button>
-        <button class="foul-btn" id="tie" onclick="endFrame(0)">Uusi frame/rerack</button>
-        <button class="foul-btn" id="win2" onclick="endFrame(2)">...</button>
-    </div>
-    <br><br>
     <form onsubmit="event.preventDefault(); initFrame();">
         <label for="gameValue">Punaisten määrä alussa (vaikuttaa seuraavaan aloitettuun frameen):</label>
         <input type="number" id="nReds" name="gameValue" value="15" required>
     </form>
-
-    <button onclick="if(confirm('Oletko varma?')) initMatch();">Aloita uusi ottelu</button>
-
-    <div class="scoreboard">
-        <div class="player">
-            <h3>Top 10 lyöntisarjat:</h3>
-            <ul id="breaks1"></ul>
-        </div>
-        <div class="player">
-            <h3>Top 10 lyöntisarjat:</h3>
-            <ul id="breaks2"></ul>
-        </div>
-    </div>
 
     <script>
         let history = [];
         let redsStart = 15;
         let matchBreaks = [[],[]];
         let frameScore = [0, 0]; // Track frames won (Player 1 - Player 2)
+        const SHOW_BREAKS = 10;
 
         function redsRemaining(){
             redsPotted = history.filter(action => action.type === 'pot' && action.points === 1 && action.isFreeBall === false).length
@@ -176,7 +173,6 @@
                 breaks[currentPlayer].push(currentBreak)
             }
 
-            const SHOW_BREAKS = 10;
             breaks[0].push(...matchBreaks[0])
             breaks[1].push(...matchBreaks[1])
             breaks[0] = breaks[0].sort((a,b)=>b-a).slice(0,SHOW_BREAKS);
@@ -319,6 +315,11 @@
 
         function updateBreakList() {
             breaks = getBreaks()
+            for(let i=0; i<2; i++){
+                while (breaks[i].length < SHOW_BREAKS) {
+                    breaks[i].push('-');
+                }
+            }
             document.getElementById('breaks1').innerHTML = breaks[0].map(b => `<li>${b}</li>`).join('');
             document.getElementById('breaks2').innerHTML = breaks[1].map(b => `<li>${b}</li>`).join('');
         }
