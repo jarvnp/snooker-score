@@ -7,6 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; overflow: hidden;}
         .scoreboard { display: flex; justify-content: center; gap: 5%; flex-wrap: wrap; }
+        .player-name {font-size: 1vw; text-align: center; font-weight: bold;}
         .control-boxs {display: flex; justify-content: center; gap: 5%;}
         .player { border: 0.15vw solid black; padding: 0.5%; width: 15vw; text-align: center;}
         .active { background-color: lightgreen; }
@@ -37,11 +38,11 @@
             <ul id="breaks1"></ul>
         </div>
         <div class="player" id="player1">
-            <input type="text" id="name1" value="Player 1">
+            <input type="text" class="player-name" id="name1" value="Player 1">
             <h1><span id="score1" class="score">0</span></h1>
         </div>
         <div class="player" id="player2">
-            <input type="text" id="name2" value="Player 2">
+            <input type="text" class="player-name" id="name2" value="Player 2">
             <h1><span id="score2" class="score">0</span></h1>
         </div>
         <div class="player">
