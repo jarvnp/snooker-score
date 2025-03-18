@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snooker Scoreboard</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; overflow: hidden;}
+        body { font-family: Arial, sans-serif; text-align: center; font-size: 1vw}
         .scoreboard { display: flex; justify-content: center; gap: 5%; flex-wrap: wrap; }
         .player-name {font-size: 1vw; text-align: center; font-weight: bold;}
         .control-boxs {display: flex; justify-content: center; gap: 5%;}
         .player { border: 0.15vw solid black; padding: 0.5%; width: 15vw; text-align: center;}
         .active { background-color: lightgreen; }
         .controls {display: flex; flex-wrap: nowrap; justify-content: center; gap:1%;}
-        .btn {padding: 1%; margin-top: 3%; border: none; cursor: pointer;font-size: 0.8vw}
+        .btn {padding: 1%; margin-top: 3%; border: none; cursor: pointer;font-size: 1vw}
         .ball-btn {color: white; }
         .score { font-size: 7vw;}
         .red { background-color: red; }
@@ -27,11 +27,10 @@
         .undo-btn {background-color: #f0f0f0; /* Light gray background */
             border: 0.15vw solid black; /* Adds a border */
         }
+        input{ font-size:inherit; }
     </style>
 </head>
 <body>
-    <h1>Snooker Scoreboard</h1>
-
     <div class="scoreboard">
         <div class="player">
             <h3>Top 10 lyöntisarjat:</h3>
@@ -195,6 +194,7 @@
             frameScore = [0, 0];
             document.getElementById('name1').value = "Player 1"
             document.getElementById('name2').value = "Player 2"
+            updateButtonLabels();
             initFrame()
         }
 
