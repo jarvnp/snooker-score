@@ -7,9 +7,10 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; font-size: 1vw}
         .scoreboard { display: flex; justify-content: center; gap: 5%; flex-wrap: wrap; }
-        .player-name {font-size: 1vw; text-align: center; font-weight: bold;}
+        .player-name {font-size: 1.9vw; text-align: center; font-weight: bold;width:97%}
         .control-boxs {display: flex; justify-content: center; gap: 5%;}
-        .player { border: 0.15vw solid black; padding: 0.5%; width: 15vw; text-align: center;}
+        .player { border: 0.15vw solid black; padding: 0.5%; width: 25vw; text-align: center;}
+        .breaks { border: 0.15vw solid black; padding: 0.5%; width: 10vw; text-align: center;}
         .active { background-color: lightgreen; }
         .controls {display: flex; flex-wrap: nowrap; justify-content: center; gap:1%;}
         .btn {padding: 1%; margin-top: 3%; border: none; cursor: pointer;font-size: 1vw}
@@ -32,8 +33,8 @@
 </head>
 <body>
     <div class="scoreboard">
-        <div class="player">
-            <h3>Top 10 lyöntisarjat:</h3>
+        <div class="breaks">
+            <h3>Top 6 lyöntisarjat:</h3>
             <ul id="breaks1"></ul>
         </div>
         <div class="player" id="player1">
@@ -44,16 +45,208 @@
             <input type="text" class="player-name" id="name2" value="Player 2">
             <h1><span id="score2" class="score">0</span></h1>
         </div>
-        <div class="player">
-            <h3>Top 10 lyöntisarjat:</h3>
+        <div class="breaks">
+            <h3>Top 6 lyöntisarjat:</h3>
             <ul  id="breaks2"></ul>
         </div>
     </div>
 
     <h2><span id="frameScore">0 - 0</span></h2>
 
+
+
+
+
+
     <h3>Nykyinen breikki: <span id="currentBreak">0</span></h3>
     <div class="break-display" id="breakBalls"></div>
+
+
+
+
+
+<!-- ChatGPT -->
+<!-- Kellon kenttä -->
+<div style="height: 60px; width: 100%; border: 1px solid black; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; box-sizing: border-box; font-size: 30px;">
+    <div id="mainClock" style="width: 5ch;">10:00</div>
+
+    <div style="flex-grow: 1; margin: 0 10px; position: relative; height: 25px; background: #ddd;"> <!-- paksumpi palkki -->
+        <div id="progressBar" style="height: 100%; width: 0%; background: green; transition: width 1s linear, background 0.5s;"></div>
+    </div>
+
+    <button id="clockButton" onclick="toggleClock()" style="font-size: 20px; padding: 5px 20px; min-width: 180px;">start/stop (välilyönti)</button>
+    <div id="shootoutClock" style="width: 3ch;">15</div>
+</div>
+
+<!-- Scripti kahden kellon, palkin ja äänimerkkien toimintaan -->
+<script>
+let shootoutInterval;
+let mainClockInterval;
+let shootoutRunning = false;
+let shootoutSeconds = 15; // Alussa 15 sekuntia
+let mainSeconds = 600; // 10 minuuttia
+let clocksStarted = false;
+let initialShootoutSeconds = 15;
+let beepTimeouts = []; // Tallennetaan aikaisemmat piippaukset, jotta voidaan peruuttaa ne
+
+function initShootoutClock(){
+    shootoutRunning = false;
+    shootoutSeconds = 15; // Alussa 15 sekuntia
+    mainSeconds = 600; // 10 minuuttia
+    clocksStarted = false;
+    initialShootoutSeconds = 15;
+    beepTimeouts = []; // Tallennetaan aikaisemmat piippaukset, jotta voidaan peruuttaa ne
+    clearInterval(mainClockInterval);
+    clearInterval(shootoutInterval);
+    updateShootoutDisplay();
+    updateMainClockDisplay();
+    updateProgressBar();
+}
+
+function updateShootoutDisplay() {
+    document.getElementById('shootoutClock').textContent = shootoutSeconds;
+}
+
+function updateMainClockDisplay() {
+    const minutes = Math.floor(mainSeconds / 60);
+    const seconds = mainSeconds % 60;
+    document.getElementById('mainClock').textContent =
+        `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+function updateProgressBar() {
+    const progressBar = document.getElementById('progressBar');
+    const percentage = ((initialShootoutSeconds - shootoutSeconds) / initialShootoutSeconds) * 100;
+    progressBar.style.width = `${percentage}%`;
+
+    if (shootoutSeconds <= 5) {
+        progressBar.style.background = 'red'; // Viimeiset 5 sekuntia punaisella
+    } else {
+        progressBar.style.background = 'green';
+    }
+}
+
+// Äänimerkin luonti
+function beep(frequency = 1000, duration = 200, volume = 0.5) {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    oscillator.type = 'square';
+    oscillator.frequency.value = frequency;
+    gainNode.gain.value = volume;
+
+    oscillator.start();
+    setTimeout(() => {
+        oscillator.stop();
+        context.close();
+    }, duration);
+}
+
+function toggleClock() {
+    if (!clocksStarted) {
+        clocksStarted = true;
+        startMainClock();
+    }
+
+    if (!shootoutRunning) {
+        startShootoutClock();
+    } else {
+        resetShootoutClock();
+    }
+}
+
+function getShootoutStartSeconds() {
+    return (mainSeconds > 300) ? 15 : 10;
+}
+
+function startShootoutClock() {
+    shootoutRunning = true;
+    initialShootoutSeconds = getShootoutStartSeconds();
+    updateShootoutDisplay();
+    shootoutSeconds = initialShootoutSeconds-1;
+    updateProgressBar();
+
+    shootoutInterval = setInterval(() => {
+        if (shootoutSeconds > 0) {
+            updateShootoutDisplay();
+
+
+
+            // Piippaukset 5, 4, 3, 2, 1 sekunnin kohdalla
+            if (shootoutSeconds <= 5 && shootoutSeconds > 0) {
+                beep(1000, 150, 0.3); // Kevyt piippaus
+            }
+            shootoutSeconds--;
+            updateProgressBar();
+        } else {
+            // Piippaus nollassa
+            beep(500, 500, 1.0); // Voimakas piippaus
+            clearInterval(shootoutInterval);
+            shootoutRunning = false;
+            shootoutSeconds = getShootoutStartSeconds();
+            updateShootoutDisplay();
+            updateProgressBar(); // Päivitetään palkki heti
+
+            // Palkki jää punaiseksi
+            document.getElementById('progressBar').style.background = 'red';
+        }
+    }, 1000);
+}
+
+function resetShootoutClock() {
+    clearInterval(shootoutInterval);
+    initialShootoutSeconds = getShootoutStartSeconds();
+    shootoutSeconds = initialShootoutSeconds;
+    updateShootoutDisplay();
+    updateProgressBar();
+    shootoutRunning = false;
+
+    // Palkki jää punaiseksi, jos aika on loppunut
+    if (shootoutSeconds <= 0) {
+        document.getElementById('progressBar').style.background = 'red'; // Varmistetaan, että palkki jää punaiseksi
+    } else {
+        document.getElementById('progressBar').style.background = '#ddd'; // Palkki palautetaan alkuperäiseen väriinsä
+    }
+}
+
+function startMainClock() {
+    updateMainClockDisplay();
+    mainClockInterval = setInterval(() => {
+        if (mainSeconds > 0) {
+            mainSeconds--;
+            updateMainClockDisplay();
+        } else {
+            clearInterval(mainClockInterval);
+        }
+    }, 1000);
+}
+
+// Näppäimistön kuuntelu: Space toimii kuten painike
+document.addEventListener('keydown', function(event) {
+    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+        return; // Exit the function to disable the event
+    }
+    if (event.code === 'Space') {
+        event.preventDefault(); // Estää sivun vierityksen space-painalluksella
+        toggleClock();
+    }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
 
     <h2>Mahdolliset pisteet pöydällä: <span id="remaining">147</span></h2>
 
@@ -100,7 +293,7 @@
         let redsStart = 15;
         let matchBreaks = [[],[]];
         let frameScore = [0, 0]; // Track frames won (Player 1 - Player 2)
-        const SHOW_BREAKS = 10;
+        const SHOW_BREAKS = 6;
 
         function redsRemaining(){
             redsPotted = history.filter(action => action.type === 'pot' && action.points === 1 && action.isFreeBall === false).length
@@ -186,6 +379,7 @@
             history = [];
             redsStart = nReds;
             updateUI();
+            initShootoutClock();
         }
 
         function initMatch(){
